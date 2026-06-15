@@ -3,9 +3,9 @@ const razorpay = require('../config/razorpay');
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
 
-// @desc    Create Razorpay order
-// @route   POST /api/payments/create-order
-// @access  Public
+// Create Razorpay order
+// POST /api/payments/create-order
+// Public
 exports.createRazorpayOrder = async (req, res) => {
   try {
     const { orderId, amount } = req.body;
@@ -44,9 +44,9 @@ exports.createRazorpayOrder = async (req, res) => {
   }
 };
 
-// @desc    Verify Razorpay payment signature
-// @route   POST /api/payments/verify
-// @access  Public
+// Verify Razorpay payment signature
+// POST /api/payments/verify
+// Public
 exports.verifyPayment = async (req, res) => {
   try {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature, orderId } = req.body;
@@ -84,9 +84,9 @@ exports.verifyPayment = async (req, res) => {
   }
 };
 
-// @desc    Get payment by order ID
-// @route   GET /api/payments/:orderId
-// @access  Public
+// Get payment by order ID
+// GET /api/payments/:orderId
+// Public
 exports.getPayment = async (req, res) => {
   try {
     const payment = await Payment.findOne({ orderId: req.params.orderId });

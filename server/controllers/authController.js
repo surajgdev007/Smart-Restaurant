@@ -6,9 +6,9 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
 };
 
-// @desc    Register admin
-// @route   POST /api/auth/register
-// @access  Public (one-time setup)
+// Register admin
+// POST /api/auth/register
+// Public (one-time setup)
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -31,9 +31,9 @@ exports.register = async (req, res) => {
   }
 };
 
-// @desc    Login admin
-// @route   POST /api/auth/login
-// @access  Public
+// Login admin
+// POST /api/auth/login
+// Public
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -64,9 +64,9 @@ exports.login = async (req, res) => {
   }
 };
 
-// @desc    Get current logged-in admin
-// @route   GET /api/auth/me
-// @access  Private
+// Get current logged-in admin
+// GET /api/auth/me
+// Private
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);

@@ -1,8 +1,8 @@
 const Order = require('../models/Order');
 
-// @desc    Place a new order (Customer)
-// @route   POST /api/orders
-// @access  Public
+// Place a new order (Customer)
+// POST /api/orders
+// Public
 exports.placeOrder = async (req, res) => {
   try {
     const { tableNumber, items, specialInstructions, customerName } = req.body;
@@ -38,9 +38,9 @@ exports.placeOrder = async (req, res) => {
   }
 };
 
-// @desc    Get all orders (Admin)
-// @route   GET /api/orders
-// @access  Private (Admin)
+// Get all orders (Admin)
+// GET /api/orders
+// Private (Admin)
 exports.getAllOrders = async (req, res) => {
   try {
     const filter = {};
@@ -62,9 +62,9 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// @desc    Get single order
-// @route   GET /api/orders/:id
-// @access  Public
+// Get single order
+// GET /api/orders/:id
+// Public
 exports.getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate('items.menuItem', 'name image price');
@@ -75,9 +75,9 @@ exports.getOrder = async (req, res) => {
   }
 };
 
-// @desc    Update order status (Admin)
-// @route   PUT /api/orders/:id/status
-// @access  Private (Admin)
+// Update order status (Admin)
+// PUT /api/orders/:id/status
+// Private (Admin)
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderStatus } = req.body;
@@ -103,9 +103,9 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// @desc    Get dashboard stats (Admin)
-// @route   GET /api/orders/stats
-// @access  Private (Admin)
+// Get dashboard stats (Admin)
+// GET /api/orders/stats
+// Private (Admin)
 exports.getDashboardStats = async (req, res) => {
   try {
     const today = new Date();

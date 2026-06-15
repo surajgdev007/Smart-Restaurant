@@ -12,9 +12,9 @@ const generateQR = async (tableNumber, clientUrl) => {
   return { qrCode, qrUrl };
 };
 
-// @desc    Get all tables
-// @route   GET /api/tables
-// @access  Public
+// Get all tables
+// GET /api/tables
+// Public
 exports.getTables = async (req, res) => {
   try {
     const tables = await Table.find({ isActive: true }).sort({ tableNumber: 1 });
@@ -24,9 +24,9 @@ exports.getTables = async (req, res) => {
   }
 };
 
-// @desc    Get single table by number
-// @route   GET /api/tables/:number
-// @access  Public
+// Get single table by number
+// GET /api/tables/:number
+// Public
 exports.getTableByNumber = async (req, res) => {
   try {
     const table = await Table.findOne({ tableNumber: req.params.number, isActive: true });
@@ -37,9 +37,9 @@ exports.getTableByNumber = async (req, res) => {
   }
 };
 
-// @desc    Create table and generate QR
-// @route   POST /api/tables
-// @access  Private (Admin)
+// Create table and generate QR
+// POST /api/tables
+// Private (Admin)
 exports.createTable = async (req, res) => {
   try {
     const { tableNumber, capacity } = req.body;
@@ -58,9 +58,9 @@ exports.createTable = async (req, res) => {
   }
 };
 
-// @desc    Update table
-// @route   PUT /api/tables/:id
-// @access  Private (Admin)
+// Update table
+// PUT /api/tables/:id
+// Private (Admin)
 exports.updateTable = async (req, res) => {
   try {
     const table = await Table.findByIdAndUpdate(req.params.id, req.body, {
@@ -73,9 +73,9 @@ exports.updateTable = async (req, res) => {
   }
 };
 
-// @desc    Delete table
-// @route   DELETE /api/tables/:id
-// @access  Private (Admin)
+// Delete table
+// DELETE /api/tables/:id
+// Private (Admin)
 exports.deleteTable = async (req, res) => {
   try {
     const table = await Table.findByIdAndDelete(req.params.id);
@@ -86,9 +86,9 @@ exports.deleteTable = async (req, res) => {
   }
 };
 
-// @desc    Regenerate QR for a table
-// @route   POST /api/tables/:id/regenerate-qr
-// @access  Private (Admin)
+// Regenerate QR for a table
+// POST /api/tables/:id/regenerate-qr
+// Private (Admin)
 exports.regenerateQR = async (req, res) => {
   try {
     const table = await Table.findById(req.params.id);

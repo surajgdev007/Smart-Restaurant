@@ -2,9 +2,9 @@ const MenuItem = require('../models/MenuItem');
 const path = require('path');
 const fs = require('fs');
 
-// @desc    Get all menu items (public)
-// @route   GET /api/menu
-// @access  Public
+// Get all menu items (public)
+// GET /api/menu
+// Public
 exports.getMenuItems = async (req, res) => {
   try {
     const filter = { isAvailable: true };
@@ -23,9 +23,9 @@ exports.getMenuItems = async (req, res) => {
   }
 };
 
-// @desc    Get all menu items (admin - includes unavailable)
-// @route   GET /api/menu/all
-// @access  Private (Admin)
+// Get all menu items (admin - includes unavailable)
+// GET /api/menu/all
+// Private (Admin)
 exports.getAllMenuItems = async (req, res) => {
   try {
     const filter = {};
@@ -41,9 +41,9 @@ exports.getAllMenuItems = async (req, res) => {
   }
 };
 
-// @desc    Get single menu item
-// @route   GET /api/menu/:id
-// @access  Public
+// Get single menu item
+// GET /api/menu/:id
+// Public
 exports.getMenuItem = async (req, res) => {
   try {
     const item = await MenuItem.findById(req.params.id).populate('category', 'name');
@@ -54,9 +54,9 @@ exports.getMenuItem = async (req, res) => {
   }
 };
 
-// @desc    Create menu item
-// @route   POST /api/menu
-// @access  Private (Admin)
+// Create menu item
+// POST /api/menu
+// Private (Admin)
 exports.createMenuItem = async (req, res) => {
   try {
     const itemData = { ...req.body };
@@ -71,9 +71,9 @@ exports.createMenuItem = async (req, res) => {
   }
 };
 
-// @desc    Update menu item
-// @route   PUT /api/menu/:id
-// @access  Private (Admin)
+// Update menu item
+// PUT /api/menu/:id
+// Private (Admin)
 exports.updateMenuItem = async (req, res) => {
   try {
     const updateData = { ...req.body };
@@ -92,9 +92,9 @@ exports.updateMenuItem = async (req, res) => {
   }
 };
 
-// @desc    Delete menu item
-// @route   DELETE /api/menu/:id
-// @access  Private (Admin)
+// Delete menu item
+// DELETE /api/menu/:id
+// Private (Admin)
 exports.deleteMenuItem = async (req, res) => {
   try {
     const item = await MenuItem.findByIdAndDelete(req.params.id);

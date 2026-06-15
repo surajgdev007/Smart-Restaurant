@@ -1,8 +1,8 @@
 const Category = require('../models/Category');
 
-// @desc    Get all categories
-// @route   GET /api/categories
-// @access  Public
+// Get all categories
+// GET /api/categories
+// Public
 exports.getCategories = async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true }).sort({ sortOrder: 1, name: 1 });
@@ -12,9 +12,9 @@ exports.getCategories = async (req, res) => {
   }
 };
 
-// @desc    Get all categories including inactive (admin)
-// @route   GET /api/categories/all
-// @access  Private
+// Get all categories including inactive (admin)
+// GET /api/categories/all
+// Private
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ sortOrder: 1, name: 1 });
@@ -24,9 +24,9 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
-// @desc    Create category
-// @route   POST /api/categories
-// @access  Private (Admin)
+// @Create category
+// @POST /api/categories
+// @Private (Admin)
 exports.createCategory = async (req, res) => {
   try {
     const { name, description, sortOrder } = req.body;
@@ -40,9 +40,9 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-// @desc    Update category
-// @route   PUT /api/categories/:id
-// @access  Private (Admin)
+// @Update category
+// @PUT /api/categories/:id
+// @Private (Admin)
 exports.updateCategory = async (req, res) => {
   try {
     const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
@@ -55,9 +55,9 @@ exports.updateCategory = async (req, res) => {
   }
 };
 
-// @desc    Delete category
-// @route   DELETE /api/categories/:id
-// @access  Private (Admin)
+//  Delete category
+//  DELETE /api/categories/:id
+//  Private (Admin)
 exports.deleteCategory = async (req, res) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);

@@ -42,7 +42,19 @@ socketHandler(io);
 app.use(helmet({ contentSecurityPolicy: false })); // security headers
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); // request logging
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    const allowed = [
+      process.env.CLIENT_URL,
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ].filter(Boolean);
+    // Allow requests with no origin (mobile/Postman) + Netlify domains
+    if (!origin || allowed.includes(origin) || origin.endsWith('.netlify.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());

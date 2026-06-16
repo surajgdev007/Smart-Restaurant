@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+// In dev: Vite proxy handles /api → localhost:5001
+// In prod (Netlify): use full Render backend URL from env variable
+const baseURL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : '/api';
+
 const API = axios.create({
-  baseURL: '/api',
+  baseURL,
   headers: { 'Content-Type': 'application/json' },
 });
 

@@ -1,10 +1,16 @@
 import { io } from 'socket.io-client';
 
+// In dev: connect directly to local backend
+// In prod: connect to deployed Render backend
+const SOCKET_URL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/$/, '')
+  : 'http://localhost:5001';
+
 let socketInstance = null;
 
 const initSocket = () => {
   if (!socketInstance) {
-    socketInstance = io('http://localhost:5001', { transports: ['websocket'] });
+    socketInstance = io(SOCKET_URL, { transports: ['websocket'] });
   }
   return socketInstance;
 };

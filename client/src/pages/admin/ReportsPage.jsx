@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getAllOrders } from '../../services/api';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import toast from 'react-hot-toast';
@@ -8,57 +8,65 @@ const COLORS = ['#f97316', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444'
 export default function ReportsPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('7'); // days
+  const [period, setPeriod] = useState('7');
 
   useEffect(() => {
     getAllOrders()
-      .then(res => setOrders(res.data.data))
+      .then(res => setOrders(res.data.data || []))
       .catch(() => toast.error('Failed to load orders'))
       .finally(() => setLoading(false));
   }, []);
 
-  const paidOrders = orders.filter(o => o.paymentStatus === 'paid');
+  const paidOrders = useMemo(() => orders.filter(o => o.paymentStatus === 'paid'), [orders]);
 
-  // Daily revenue for last N days
-  const getDailyData = () => {
+  const dailyData = useMemo(() => {
     const days = [];
     for (let i = Number(period) - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       d.setHours(0, 0, 0, 0);
-      const next = new Date(d); next.setDate(next.getDate() + 1);
+      const next = new Date(d);
+      next.setDate(next.getDate() + 1);
       const dayOrders = paidOrders.filter(o => {
         const created = new Date(o.createdAt);
         return created >= d && created < next;
       });
       days.push({
         date: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
-        revenue: dayOrders.reduce((s, o) => s + o.grandTotal, 0),
+        revenue: parseFloat(dayOrders.reduce((s, o) => s + (o.grandTotal || 0), 0).toFixed(2)),
         orders: dayOrders.length,
       });
     }
     return days;
-  };
+  }, [paidOrders, period]);
 
-  // Orders by status pie
-  const statusData = () => {
+  const pieData = useMemo(() => {
     const groups = {};
     orders.forEach(o => { groups[o.orderStatus] = (groups[o.orderStatus] || 0) + 1; });
     return Object.entries(groups).map(([name, value]) => ({ name, value }));
-  };
+  }, [orders]);
 
-  // Top items
-  const topItems = () => {
+  const topItems = useMemo(() => {
     const counts = {};
     paidOrders.forEach(o => o.items?.forEach(item => {
       counts[item.name] = (counts[item.name] || 0) + item.quantity;
     }));
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([name, qty]) => ({ name, qty }));
-  };
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name, qty]) => ({ name, qty }));
+  }, [paidOrders]);
 
-  const totalRevenue = paidOrders.reduce((s, o) => s + o.grandTotal, 0);
+  const totalRevenue = paidOrders.reduce((s, o) => s + (o.grandTotal || 0), 0);
   const avgOrderValue = paidOrders.length ? totalRevenue / paidOrders.length : 0;
-  const dailyData = getDailyData();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="dot-loading flex gap-2"><span /><span /><span /></div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -90,7 +98,7 @@ export default function ReportsPage() {
         ))}
       </div>
 
-      {/* Revenue & Orders Chart */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="card p-6">
           <h3 className="font-display font-bold text-white mb-4">📈 Daily Revenue</h3>
@@ -111,7 +119,7 @@ export default function ReportsPage() {
             <LineChart data={dailyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 11 }} />
-              <YAxis tick={{ fill: '#64748b', fontSize: 11 }} />
+              <YAxis tick={{ fill: '#64748b', fontSize: 11 }} allowDecimals={false} />
               <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f1f5f9' }} />
               <Line type="monotone" dataKey="orders" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6' }} name="Orders" />
             </LineChart>
@@ -119,39 +127,53 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Status Pie + Top Items */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Pie Chart */}
         <div className="card p-6">
           <h3 className="font-display font-bold text-white mb-4">🥧 Orders by Status</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={statusData()} cx="50%" cy="50%" outerRadius={80} dataKey="value" nameKey="name" label={({ name, value }) => `${name}: ${value}`}>
-                {statusData().map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-              </Pie>
-              <Legend />
-              <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f1f5f9' }} />
-            </PieChart>
-          </ResponsiveContainer>
+          {pieData.length === 0 ? (
+            <div className="h-48 flex items-center justify-center text-dark-400 text-sm">No orders yet</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%" cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Legend />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f1f5f9' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
+        {/* Top Items */}
         <div className="card p-6">
           <h3 className="font-display font-bold text-white mb-4">🏆 Top Selling Items</h3>
-          {topItems().length === 0 ? (
-            <p className="text-dark-400 text-sm">No data yet</p>
+          {topItems.length === 0 ? (
+            <div className="h-48 flex items-center justify-center text-dark-400 text-sm">
+              No sales data yet. Complete some orders to see top items.
+            </div>
           ) : (
             <div className="space-y-3">
-              {topItems().map((item, i) => (
+              {topItems.map((item, i) => (
                 <div key={item.name} className="flex items-center gap-3">
-                  <span className="text-dark-400 text-sm w-6">{i + 1}.</span>
+                  <span className="text-dark-400 text-sm w-6 font-bold">{i + 1}.</span>
                   <div className="flex-1">
                     <div className="flex justify-between mb-1">
                       <span className="text-white text-sm truncate">{item.name}</span>
-                      <span className="text-dark-400 text-sm">{item.qty} sold</span>
+                      <span className="text-dark-400 text-sm flex-shrink-0 ml-2">{item.qty} sold</span>
                     </div>
                     <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-brand-500 rounded-full"
-                        style={{ width: `${(item.qty / topItems()[0].qty) * 100}%` }}
+                        className="h-full bg-brand-500 rounded-full transition-all duration-500"
+                        style={{ width: `${(item.qty / topItems[0].qty) * 100}%` }}
                       />
                     </div>
                   </div>

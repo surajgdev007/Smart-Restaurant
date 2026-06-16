@@ -54,12 +54,23 @@ exports.getMenuItem = async (req, res) => {
   }
 };
 
+// Helper: convert FormData string booleans to real booleans
+const parseBooleans = (data) => {
+  const boolFields = ['isVeg', 'isAvailable', 'isPopular', 'isBestSeller'];
+  boolFields.forEach(field => {
+    if (field in data) {
+      data[field] = data[field] === 'true' || data[field] === true;
+    }
+  });
+  return data;
+};
+
 // Create menu item
 // POST /api/menu
 // Private (Admin)
 exports.createMenuItem = async (req, res) => {
   try {
-    const itemData = { ...req.body };
+    const itemData = parseBooleans({ ...req.body });
     if (req.file) {
       itemData.image = `/uploads/${req.file.filename}`;
     }
@@ -76,7 +87,7 @@ exports.createMenuItem = async (req, res) => {
 // Private (Admin)
 exports.updateMenuItem = async (req, res) => {
   try {
-    const updateData = { ...req.body };
+    const updateData = parseBooleans({ ...req.body });
     if (req.file) {
       updateData.image = `/uploads/${req.file.filename}`;
     }
@@ -99,6 +110,13 @@ exports.deleteMenuItem = async (req, res) => {
   try {
     const item = await MenuItem.findByIdAndDelete(req.params.id);
     if (!item) return res.status(404).json({ success: false, message: 'Menu item not found' });
+
+    // Remove image file if exists
+    if (item.image && item.image.startsWith('/uploads/')) {
+      const filePath = path.join(__dirname, '..', item.image);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
     res.json({ success: true, message: 'Menu item deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

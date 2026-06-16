@@ -52,7 +52,7 @@ export default function CartPage() {
 
         {/* Cart Items */}
         <div className="space-y-3 mb-6">
-          {items.map(item => (
+          {items?.map(item => (
             <div key={item._id} className="card p-4 flex items-center gap-4 animate-enter">
               <div className="w-16 h-16 rounded-xl overflow-hidden bg-dark-700 flex-shrink-0">
                 {item.image ? (

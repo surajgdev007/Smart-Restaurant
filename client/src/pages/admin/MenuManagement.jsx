@@ -18,9 +18,14 @@ export default function MenuManagement() {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const [itemsRes, catsRes] = await Promise.all([getAllMenuItems({ category: filterCat || undefined }), getAllCategories()]);
-      setItems(itemsRes.data.data);
-      setCategories(catsRes.data.data);
+      const params = {};
+      if (filterCat) params.category = filterCat;
+      const [itemsRes, catsRes] = await Promise.all([
+        getAllMenuItems(params),
+        getAllCategories(),
+      ]);
+      setItems(itemsRes.data.data || []);
+      setCategories(catsRes.data.data || []);
     } catch { toast.error('Failed to load data'); }
     finally { setLoading(false); }
   };

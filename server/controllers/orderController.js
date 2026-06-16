@@ -45,6 +45,7 @@ exports.getAllOrders = async (req, res) => {
   try {
     const filter = {};
     if (req.query.status) filter.orderStatus = req.query.status;
+    if (req.query.tableNumber) filter.tableNumber = Number(req.query.tableNumber);
     if (req.query.date) {
       const startDate = new Date(req.query.date);
       const endDate = new Date(req.query.date);

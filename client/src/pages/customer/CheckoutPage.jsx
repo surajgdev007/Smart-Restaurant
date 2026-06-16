@@ -11,6 +11,18 @@ export default function CheckoutPage() {
   const [instructions, setInstructions] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Guard: redirect if cart is empty
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-dark-950 flex flex-col items-center justify-center text-center px-4">
+        <div className="text-6xl mb-4">🛒</div>
+        <h2 className="text-xl font-display font-bold text-white mb-2">Your cart is empty</h2>
+        <p className="text-dark-400 mb-6">Add items to your cart before checking out.</p>
+        <button onClick={() => navigate(-1)} className="btn-primary">← Go Back</button>
+      </div>
+    );
+  }
+
   const handlePayment = async () => {
     if (!tableNumber) {
       toast.error('Table number is missing. Please scan the QR code again.');

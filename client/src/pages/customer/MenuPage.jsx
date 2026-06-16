@@ -9,7 +9,7 @@ export default function MenuPage() {
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get('table');
   const navigate = useNavigate();
-  const { totalItems, grandTotal, setTable, tableNumber: cartTable } = useCart();
+  const { totalItems, grandTotal, setTable } = useCart();
 
   const [categories, setCategories] = useState([]);
   const [items, setItems] = useState([]);
@@ -125,7 +125,7 @@ export default function MenuPage() {
           >
             🍴 All
           </button>
-          {categories.map(cat => (
+          {categories?.map(cat => (
             <button
               key={cat._id}
               onClick={() => setSelectedCat(cat._id)}

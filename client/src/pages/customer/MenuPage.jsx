@@ -33,12 +33,13 @@ export default function MenuPage() {
       if (selectedCat) params.category = selectedCat;
       if (search) params.search = search;
       const res = await getMenuItems(params);
-      let data = res.data.data;
+      let data = res.data.data || [];          // ← fix: never undefined
       if (filter === 'veg') data = data.filter(i => i.isVeg);
       if (filter === 'nonveg') data = data.filter(i => !i.isVeg);
       setItems(data);
     } catch {
       toast.error('Failed to load menu');
+      setItems([]);                            // ← fix: reset to empty on error
     } finally {
       setLoading(false);
     }

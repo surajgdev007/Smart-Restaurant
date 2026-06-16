@@ -18,8 +18,8 @@ export default function OrdersManagement() {
   const fetchOrders = async () => {
     try {
       const res = await getAllOrders({ status: filterStatus || undefined });
-      setOrders(res.data.data);
-    } catch { toast.error('Failed to load orders'); }
+      setOrders(res.data.data || []);        // ← fix: never undefined
+    } catch { toast.error('Failed to load orders'); setOrders([]); }
     finally { setLoading(false); }
   };
 
